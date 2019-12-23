@@ -2,6 +2,9 @@ package _04_Base64_Decoder;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.ListIterator;
 
 public class Base64Decoder {
 	/*
@@ -50,13 +53,20 @@ public class Base64Decoder {
 	//   array should be the binary value of the encoded characters.
 	public static byte[] convert4CharsTo24Bits(String s){
 		byte[] b = new byte[3];
-		String s2 = "";
-		b[0] = (byte) ((convertBase64Char(s2.charAt(0)) << 1) | 1);//wrong
+		System.out.println(s.charAt(0));
+		System.out.println(toBinary(new byte[] {(byte) (convertBase64Char(s.charAt(0)) << 2)}));
+		System.out.println(s.charAt(1));
+		System.out.println(toBinary(new byte[] {(byte) ((convertBase64Char(s.charAt(1)) << 6) >> 6)}));
+		b[0] = (byte) ((convertBase64Char(s.charAt(0)) << 2) | (convertBase64Char(s.charAt(1)) & 3));
 		
-		b[1] = (byte) ((convertBase64Char(s2.charAt(1)) << 2) | 3);//wrong
-
+		b[1] = (byte) ((convertBase64Char(s.charAt(1)) << 4) | ((convertBase64Char(s.charAt(1)) << 4) >> 4));
 		
-		return null;
+		b[2] = (byte) ((convertBase64Char(s.charAt(2)) << 6) | ((convertBase64Char(s.charAt(1)) << 2) >> 2));
+		/*for(byte b2: b) {
+			System.out.println(toBinary(new byte[] {b2}));
+		}*/
+		
+		return b;
 	}
 	
 	
@@ -64,5 +74,13 @@ public class Base64Decoder {
 	//   and returns the full byte array of the decoded base64 characters.
 	public static byte[] base64StringToByteArray(String file) {
 		return null;
+	}
+	
+	public static String toBinary( byte[] bytes )
+	{
+	    StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
+	    for( int i = 0; i < Byte.SIZE * bytes.length; i++ )
+	        sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0' : '1');
+	    return sb.toString();
 	}
 }
