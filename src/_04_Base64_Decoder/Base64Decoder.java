@@ -53,18 +53,19 @@ public class Base64Decoder {
 	//   array should be the binary value of the encoded characters.
 	public static byte[] convert4CharsTo24Bits(String s){
 		byte[] b = new byte[3];
-		System.out.println(s.charAt(0));
+		/*System.out.println(s.charAt(0));
 		System.out.println(toBinary(new byte[] {(byte) (convertBase64Char(s.charAt(0)) << 2)}));
 		System.out.println(s.charAt(1));
-		System.out.println(toBinary(new byte[] {(byte) ((convertBase64Char(s.charAt(1)) << 6) >> 6)}));
-		b[0] = (byte) ((convertBase64Char(s.charAt(0)) << 2) | (convertBase64Char(s.charAt(1)) & 3));
+		System.out.println(toBinary(new byte[] {(byte) ((convertBase64Char(s.charAt(1)) << 30) >>> 30)}));
+		*/
+		b[0] = (byte) ((convertBase64Char(s.charAt(0)) << 2) + (convertBase64Char(s.charAt(1)) >> 4));
 		
-		b[1] = (byte) ((convertBase64Char(s.charAt(1)) << 4) | ((convertBase64Char(s.charAt(1)) << 4) >> 4));
+		b[1] = (byte) ((convertBase64Char(s.charAt(1)) << 4) + (convertBase64Char(s.charAt(2)) >> 2));
 		
-		b[2] = (byte) ((convertBase64Char(s.charAt(2)) << 6) | ((convertBase64Char(s.charAt(1)) << 2) >> 2));
-		/*for(byte b2: b) {
+		b[2] = (byte) ((convertBase64Char(s.charAt(2)) << 6) + (convertBase64Char(s.charAt(3))));
+		for(byte b2: b) {
 			System.out.println(toBinary(new byte[] {b2}));
-		}*/
+		}
 		
 		return b;
 	}
@@ -73,7 +74,30 @@ public class Base64Decoder {
 	//3. Complete this method so that it takes in a string of any length
 	//   and returns the full byte array of the decoded base64 characters.
 	public static byte[] base64StringToByteArray(String file) {
-		return null;
+		ArrayList<String> strings = new ArrayList<>();
+		String using = "";
+		for(int i = 0; i < file.length(); i++) {
+			using += file.charAt(i);
+			if(i % 4 == 3) {
+				strings.add(using);
+				using = "";
+			}
+		}
+		byte[][] bytess = new byte[strings.size()][3];
+		for(int i = 0; i < strings.size(); i++) {
+			bytess[i][0] = convert4CharsTo24Bits(strings.get(i))[0];
+			bytess[i][1] = convert4CharsTo24Bits(strings.get(i))[1];
+			bytess[i][2] = convert4CharsTo24Bits(strings.get(i))[2];
+			
+		}
+		byte[] done = new byte[bytess.length * 3];
+		for(int i = 0; i < bytess.length; i++) {
+			done[i*3] = bytess[i][0];
+			done[i*3 + 1] = bytess[i][1];
+			done[i*3 + 2] = bytess[i][2];
+			
+		}
+		return done;
 	}
 	
 	public static String toBinary( byte[] bytes )
